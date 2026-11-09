@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Математикалық жаттығу</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', 'Arial', sans-serif;
+            background-color: #f4f9f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 30px 50px;
+            text-align: center;
+            width: 280px;
+            border: 4px solid #e0e0e0;
+        }
+
+        /* Сандардың және амалдың стилі */
+        .math-problem {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end; /* Оң жаққа теңестіру (баған түрінде) */
+            font-size: 80px;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-bottom: 10px;
+        }
+
+        .num-top {
+            color: #FF5722; /* Оранжевый түс */
+        }
+
+        .row-middle {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+        }
+
+        .operator {
+            color: #9C27B0; /* Күлгін түс */
+        }
+
+        .num-bottom {
+            color: #2196F3; /* Көк түс */
+        }
+
+        /* Теңдік сызығы */
+        .equals-line {
+            width: 100%;
+            height: 6px;
+            background-color: #4CAF50; /* Жасыл түс */
+            border-radius: 3px;
+            margin: 10px 0 20px 0;
+        }
+
+        /* Жауап енгізетін өріс */
+        .answer-input {
+            width: 100%;
+            font-size: 60px;
+            text-align: center;
+            border: 3px solid #ffca28;
+            border-radius: 12px;
+            outline: none;
+            color: #333;
+            padding: 5px 0;
+            box-sizing: border-box;
+        }
+
+        .answer-input:focus {
+            border-color: #ff9800;
+            box-shadow: 0 0 10px rgba(255, 152, 0, 0.5);
+        }
+
+        /* Тексеру батырмасы */
+        .check-btn {
+            margin-top: 25px;
+            width: 100%;
+            background-color: #4CAF50;
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.1s, background-color 0.2s;
+            box-shadow: 0 5px 0 #388E3C;
+        }
+
+        .check-btn:active {
+            transform: translateY(4px);
+            box-shadow: 0 1px 0 #388E3C;
+        }
+
+        /* Нәтиже хабарламасы */
+        .result-message {
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            min-height: 30px;
+        }
+
+        .correct {
+            color: #4CAF50;
+        }
+
+        .incorrect {
+            color: #F44336;
+        }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <div class="math-problem">
+        <span class="num-top" id="num1">0</span>
+        <div class="row-middle">
+            <span class="operator" id="operator">+</span>
+            <span class="num-bottom" id="num2">0</span>
+        </div>
+    </div>
+
+    <div class="equals-line"></div>
+
+    <input type="number" id="userAnswer" class="answer-input" placeholder="?" autofocus min="0">
+
+    <button class="check-btn" onclick="checkAnswer()">Тексеру</button>
+
+    <div id="result" class="result-message"></div>
+</div>
+
+<script>
+    let currentAnswer = 0;
+
+    // Кездейсоқ тапсырма генераторы
+    function generateProblem() {
+        const isAddition = Math.random() > 0.5; // Қосу немесе азайтуды таңдау
+        let n1, n2;
+
+        if (isAddition) {
+            // Қосу: қосындысы 20-дан аспауы керек
+            n1 = Math.floor(Math.random() * 13);
+            n2 = Math.floor(Math.random() * (14 - n1));
+            currentAnswer = n1 + n2;
+            document.getElementById('operator').textContent = '+';
+        } else {
+            // Азайту: нәтижесі оң сан болуы керек (20-ға дейін)
+            n1 = Math.floor(Math.random() * 14);
+            n2 = Math.floor(Math.random() * (n1 + 1));
+            currentAnswer = n1 - n2;
+            document.getElementById('operator').textContent = '-';
+        }
+
+        document.getElementById('num1').textContent = n1;
+        document.getElementById('num2').textContent = n2;
+        document.getElementById('userAnswer').value = '';
+        document.getElementById('userAnswer').focus();
+    }
+
+    // Жауапты тексеру функциясы
+    function checkAnswer() {
+        const inputField = document.getElementById('userAnswer');
+        const userAnswer = parseInt(inputField.value, 10);
+        const resultDiv = document.getElementById('result');
+
+        if (isNaN(userAnswer)) {
+            resultDiv.textContent = "Сан енгізіңіз!";
+            resultDiv.className = "result-message incorrect";
+            return;
+        }
+
+        if (userAnswer === currentAnswer) {
+            resultDiv.textContent = "Жарайсың! Дұрыс! 🎉";
+            new Audio('wow.mp3').play();
+            resultDiv.className = "result-message correct";
+            // 1.5 секундтан кейін жаңа тапсырма шығады
+            setTimeout(() => {
+                resultDiv.textContent = "";
+                generateProblem();
+            }, 1500);
+        } else {
+            resultDiv.textContent = "Қате, қайтадан байқап көр! ❌";
+            resultDiv.className = "result-message incorrect";
+            new Audio('error1.mp3').play();
+        }
+    }
+
+    // Enter пернесін басқанда да тексеру
+    document.getElementById('userAnswer').addEventListener('keyup', function(event) {
+        if (event.key === 'Enter') {
+            checkAnswer();
+        }
+    });
+
+    // Ойынды бастау
+    generateProblem();
+</script>
+
+</body>
+</html>
